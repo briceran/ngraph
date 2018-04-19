@@ -16,6 +16,10 @@
 
 cmake_minimum_required (VERSION 3.1)
 
+include(cmake/Modules/git_tags.cmake)
+NGRAPH_GET_TAG_OF_CURRENT_HASH()
+message(STATUS "release tag ${NGRAPH_CURRENT_RELEASE_TAG}")
+
 set(NGRAPH_VERSION_SHORT 0.3.0)
 set(NGRAPH_VERSION "v${NGRAPH_VERSION_SHORT}")
 

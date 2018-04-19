@@ -31,7 +31,28 @@ function(NGRAPH_GET_TAG_OF_CURRENT_HASH)
     # set(NGRAPH_CURRENT_HASH 739930197709314d0b54aea72ae0f4c93d34600e)
 
     string(REGEX MATCH "${NGRAPH_CURRENT_HASH}\t[^\r\n]*" TAG ${TAG_LIST})
-    string(REGEX REPLACE "${NGRAPH_CURRENT_HASH}\trefs/tags/" "" FINAL_TAG ${TAG})
+    set(FINAL_TAG ${TAG})
+    if (${TAG} NOT STREQUAL "")
+        string(REPLACE "${NGRAPH_CURRENT_HASH}\\trefs/tags/" "" FINAL_TAG ${TAG})
+    endif()
     set(NGRAPH_CURRENT_RELEASE_TAG ${FINAL_TAG} PARENT_SCOPE)
 endfunction()
 
+function(NGRAPH_GET_MOST_RECENT_TAG)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0
+        RESULT_VARIABLE RESULT
+        OUTPUT_VARIABLE TAG)
+    set(NGRAPH_MOST_RECENT_RELEASE_TAG ${TAG} PARENT_SCOPE)
+endfunction()
+
+function(NGRAPH_GET_VERSION_LABEL)
+    NGRAPH_GET_TAG_OF_CURRENT_HASH()
+    set(NGRAPH_VERSION_LABEL ${NGRAPH_CURRENT_RELEASE_TAG})
+    if ("${NGRAPH_CURRENT_RELEASE_TAG}" STREQUAL "")
+        message("in here")
+        NGRAPH_GET_MOST_RECENT_TAG()
+        NGRAPH_GET_CURRENT_HASH()
+        set(NGRAPH_VERSION_LABEL "${NGRAPH_MOST_RECENT_RELEASE_TAG}+${NGRAPH_CURRENT_HASH}")
+    endif()
+endfunction()
